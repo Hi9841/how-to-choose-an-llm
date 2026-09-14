@@ -1,0 +1,11 @@
+# OS & Cache
+.DS_Store
+Thumbs.db
+*.log
+__pycache__/
+*.pyc
+
+# Local agent artifacts
+.system_generated/
+.user_uploaded/
+scratch/
