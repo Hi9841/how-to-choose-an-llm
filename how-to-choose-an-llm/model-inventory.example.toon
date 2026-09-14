@@ -1,7 +1,9 @@
-models[6]{name,intel,speed,cost,context,open,provider,tags}:
-  GPT 5.6 Sol,7.0,7.0,7.0,128000,false,OpenAI,"general,balanced,tool-calling"
-  GPT 6 Astra,8.5,7.0,5.0,256000,false,OpenAI,"reasoning,coding,complex-agent"
-  Fable 5.1,9.0,6.0,5.0,256000,false,Anthropic,"deep-reasoning,architecture,math"
-  Opus 5,7.5,7.0,7.0,200000,false,Anthropic,"writing,analysis,coding,balanced"
-  Gemini 3.8 Flash,6.0,8.0,9.0,1000000,false,Google,"high-speed,massive-context,low-cost,bulk"
-  Kimi K3,8.0,3.0,6.0,200000,false,Moonshot,"deep-search,reasoning,batch"
+verification: unverified example
+note: "Illustrative names and ratings, not a live catalog. Confirm products, access, hosting, and usable context before real use."
+models[6]{name,intel,speed,cost,context,open,hosting,provider,tags}:
+  GPT 5.6 Sol,7.0,7.0,7.0,128000,false,provider-api,OpenAI,"general,balanced,tool-calling"
+  GPT 6 Astra,8.5,7.0,5.0,256000,false,provider-api,OpenAI,"reasoning,coding,complex-agent"
+  Fable 5.1,9.0,6.0,5.0,256000,false,provider-api,Anthropic,"deep-reasoning,architecture,math"
+  Opus 5,7.5,7.0,7.0,200000,false,provider-api,Anthropic,"writing,analysis,coding,balanced"
+  Gemini 3.8 Flash,6.0,8.0,9.0,1000000,false,provider-api,Google,"high-speed,massive-context,low-cost,bulk"
+  Kimi K3,8.0,3.0,6.0,200000,false,provider-api,Moonshot,"deep-search,reasoning,batch"

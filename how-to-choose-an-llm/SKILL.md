@@ -9,14 +9,14 @@ Select the best model for any AI task by balancing intelligence, speed, cost, co
 
 This skill is agent-first, self-contained, and portable. It requires no external scripts or runtime environments. Any AI agent executes the protocol directly and outputs results in Token-Oriented Object Notation (TOON) for token efficiency.
 
-## Setup workflow (`/how-to-choose-an-llm setup`)
+## Setup workflow (`choose-llm setup`)
 
 The base model inventory differs for every engineer depending on active subscriptions, enterprise accounts, API access, and local GPU hardware.
 
 ### When to run setup
 The setup workflow executes in two scenarios:
-1. **Automatic first-run execution**: When no `model-inventory.toon` file is made. The agent must immediately run the setup workflow on the very first turn before evaluating or routing any model request. Do not ask the user to manually invoke `/how-to-choose-an-llm setup`; start the guided setup directly.
-2. **Explicit re-configuration**: When the user requests `/how-to-choose-an-llm setup` or asks to edit their model list.
+1. **Automatic first run**: When neither an in-prompt inventory nor a saved inventory is available, start guided setup. A complete in-prompt inventory takes precedence and does not require a setup detour or a file write.
+2. **Explicit re-configuration**: When the user asks for `choose-llm setup` or to edit their model list. Recognize the repository's older `how-to-choose-an-llm setup` wording when supplied in conversation; do not assume every agent registers it as a command.
 
 ### Setup protocol
 Guide the engineer through four quick steps:
@@ -27,13 +27,14 @@ Guide the engineer through four quick steps:
    - **Speed (1-10)**: Responsiveness based on TTFT and TPOT.
    - **Cost (1-10)**: Economic efficiency (10 is free or cheapest, 1 is most expensive).
    - **Context**: Maximum usable token window.
-   - **Open**: `true` for self-hosted or weights-available models, `false` for proprietary APIs.
+   - **Open**: `true` if model weights are available, otherwise `false`. This says nothing about where a request runs.
+   - **Hosting**: `local` for inference on the engineer's own machine or on-prem infrastructure; `private-cloud` for their controlled cloud deployment; `provider-api` for a third-party inference service; `unknown` when unconfirmed. Each row describes one actual deployment, not a possible future installation. Use separate row names when the same model is available through multiple deployments.
    - **Provider & tags**: Hosting vendor and task tags (for example: `"coding,reasoning,fast"`).
-3. **Persist inventory**: Save the confirmed models to `model-inventory.toon` in the skill folder using TOON tabular syntax:
+3. **Persist inventory**: Update the inventory the user chose. For a new inventory, default to `model-inventory.toon` in the current workspace so skill updates cannot overwrite it. Keep legacy skill-folder inventories readable; do not migrate or overwrite them without asking. This two-row schema example uses fictional names and ratings:
    ```toon
-   models[N]{name,intel,speed,cost,context,open,provider,tags}:
-     Model A,8.0,7.0,6.0,128000,false,Provider,"tag1,tag2"
-     Model B,9.0,5.0,4.0,256000,false,Provider,"reasoning,coding"
+   models[2]{name,intel,speed,cost,context,open,hosting,provider,tags}:
+     Example API,8.0,7.0,6.0,128000,false,provider-api,Example Provider,"general,fast"
+     Example Local,9.0,5.0,4.0,256000,true,local,Own hardware,"reasoning,coding"
    ```
 4. **Confirm in TOON**: Output the saved table and present next action commands.
 
@@ -56,7 +57,7 @@ When asked to select, recommend, or route to an LLM, perform this four-step sequ
 
 Determine the five core task parameters:
 1. **Context size**: Estimated input plus completion token count.
-2. **Deployment boundary**: Does the task require private or on-prem hosting (open model only), or can it use third-party APIs?
+2. **Deployment boundary**: Determine permitted hosting (`local`, `private-cloud`, `provider-api`) separately from any open-weight requirement. For local-only or on-prem-only requests, require `hosting: local`. Clarify ambiguous "private" requirements, including whether controlled cloud infrastructure is acceptable.
 3. **Minimum intelligence floor**:
    - `5.0 - 6.5`: Text extraction, formatting, simple classification.
    - `7.0 - 8.0`: Standard agent workflows, multi-file code generation, conversational chat.
@@ -72,21 +73,26 @@ Determine the five core task parameters:
 
 ### 2. Locate model inventory (first-run gate)
 
-1. **In-prompt overrides**: If the engineer provides a model list or ratings directly in the conversation (for example: `GPT 5.6 Sol 7, 7, 7`), evaluate against those models.
-2. **Existing inventory**: If `model-inventory.toon` exists in the skill folder or workspace, read it and proceed to step 3.
+1. **In-prompt overrides**: Use the engineer's supplied models and ratings first. Ask only for fields necessary to resolve eligibility or scoring; never infer deployment from the model name or `open` flag. Do not persist a one-off override unless requested.
+2. **Existing inventory**: Prefer an explicitly named inventory, then workspace `model-inventory.toon`, then the legacy skill-folder inventory. State which source is used; do not merge conflicting inventories silently.
 3. **First run (no `model-inventory.toon` file made)**: If no `model-inventory.toon` file exists, the agent must immediately run the setup workflow. Do not output an empty state and do not tell the user to manually run a command. Directly launch the setup sequence:
    - Announce: `First run detected: no model-inventory.toon found. Running setup.`
-   - Ask the engineer if they want to initialize with the starter baseline (`model-inventory.example.toon`) or customize their own models.
-   - Collect scores (Intel, Speed, Cost on the 1-10 scale), context sizes, and provider tags.
+   - Ask whether to adapt the illustrative starter (`model-inventory.example.toon`) or enter their own models. The starter is not a verified provider catalog.
+   - Confirm access to each selected deployment, ratings, usable context, hosting, weight availability, and provider tags.
    - Save the confirmed table to `model-inventory.toon`.
    - After saving, immediately fulfill the engineer's original evaluation request using their new inventory.
 
 ### 3. Filter and calculate composite scores
 
+Validate ratings as finite numbers from 1 to 10, context as a positive integer, `open` as a boolean, hosting against the defined enum, and deployment names as unique. Ask for corrections to malformed data rather than silently coercing it. Treat absent hosting in older inventories as `unknown`; it cannot satisfy a restricted hosting boundary until confirmed. A weights-available model is not necessarily installed, affordable on available hardware, or usable under the required license.
+
+Use user-provided ratings as subjective inputs, not measured facts. For real recommendations, verify changing provider facts such as availability and usable context against current official documentation when tools allow. User access and actual deployment require user confirmation. If verification is unavailable, explicitly label the recommendation provisional. For synthetic tests, use the supplied fixture without researching fictional models. Open weights or self-hosting alone does not establish security or regulatory compliance.
+
 #### Hard filter gates
 Eliminate non-viable models before ranking:
 - Discard models whose `context` is smaller than required context.
-- Discard closed models if the task specifies open or self-hosted deployment.
+- Discard deployments outside the permitted hosting boundary. For local-only requests, reject `provider-api`, `private-cloud`, and `unknown`, even when `open: true`.
+- If the user separately requires open weights, require `open: true`. Private hosting alone is not an open-weight requirement.
 - Discard models whose `intel` rating is below the minimum intelligence floor.
 
 #### Archetype weight presets
@@ -105,12 +111,24 @@ $$\text{Score} = (w_{intel} \times \text{intel}) + (w_{speed} \times \text{speed
 
 Sort eligible models descending by composite score. Break ties using higher `intel`, then higher `speed`.
 
+Choose `cost_saver` and `escalation` only from the same eligible set: highest cost-efficiency rating for the former, highest intelligence rating for the latter. Omit either when it offers no improvement over the selected model. Never bypass context, hosting, or quality gates for an alternative.
+
 ### 4. Output response in TOON format
 
 Follow Agent eXperience Interface (AXI) standards: emit structured TOON output to save context tokens.
 
+State the archetype, hard constraints, inventory source, and verification status with the result. Quote strings where needed. Multiline primitive arrays use `- ` list markers and exact counts; tables use the exact row count. Do not put Markdown backticks into structured values. When the user requests full details, include provider, hosting, tags, and context.
+
 #### Standard recommendation format
+Illustrative calculation using the starter ratings: reasoning weights, 128000 tokens, intelligence floor 6, provider APIs allowed. These names, capacities, and ratings are not verified current product specifications.
 ```toon
+archetype: reasoning
+inventory: illustrative starter
+verification: unverified example
+constraints:
+  context: 128000
+  min_intel: 6
+  hosting: provider-api
 selected:
   name: Fable 5.1
   score: 7.9
@@ -119,13 +137,11 @@ selected:
   cost: 5.0
   context: 256000
   open: false
+  hosting: provider-api
 cost_saver:
   name: Gemini 3.8 Flash
   cost: 9.0
   intel: 6.0
-escalation:
-  name: Fable 5.1
-  intel: 9.0
 ranked[6]{rank,name,score,intel,speed,cost}:
   1,Fable 5.1,7.9,9.0,6.0,5.0
   2,GPT 6 Astra,7.65,8.5,7.0,5.0
@@ -134,8 +150,8 @@ ranked[6]{rank,name,score,intel,speed,cost}:
   5,GPT 5.6 Sol,7.0,7.0,7.0,7.0
   6,Gemini 3.8 Flash,6.8,6.0,8.0,9.0
 help[2]:
-  Specify `--full` if you want provider, tags, and context bounds expanded
-  Primary pick Fable 5.1 outscores runner-up by 0.25
+  - "Ask for full details to include provider, hosting, tags, and context."
+  - "Primary pick Fable 5.1 outscores runner-up by 0.25."
 ```
 
 #### Definitive empty state
@@ -143,25 +159,15 @@ When zero models satisfy the constraints, state the zero explicitly with the blo
 ```toon
 models: 0 models found matching constraints (min_intel=9.5)
 help[2]:
-  Review available inventory in model-inventory.toon
-  Run `/how-to-choose-an-llm setup` to add higher intelligence models
+  - Review available inventory in model-inventory.toon
+  - Ask for choose-llm setup to add higher intelligence models
 ```
 
 ---
 
 ## Baseline inventory reference
 
-Stored in `model-inventory.example.toon` as a starter template:
-
-```toon
-models[6]{name,intel,speed,cost,context,open,provider,tags}:
-  GPT 5.6 Sol,7.0,7.0,7.0,128000,false,OpenAI,"general,balanced,tool-calling"
-  GPT 6 Astra,8.5,7.0,5.0,256000,false,OpenAI,"reasoning,coding,complex-agent"
-  Fable 5.1,9.0,6.0,5.0,256000,false,Anthropic,"deep-reasoning,architecture,math"
-  Opus 5,7.5,7.0,7.0,200000,false,Anthropic,"writing,analysis,coding,balanced"
-  Gemini 3.8 Flash,6.0,8.0,9.0,1000000,false,Google,"high-speed,massive-context,low-cost,bulk"
-  Kimi K3,8.0,3.0,6.0,200000,false,Moonshot,"deep-search,reasoning,batch"
-```
+Read [model-inventory.example.toon](model-inventory.example.toon) only when the engineer chooses the starter. It is illustrative, unverified data, not a live catalog or confirmation of access. Confirm or replace the entries before saving a real inventory. Keep the baseline in that file rather than duplicating its table here.
 
 ---
 

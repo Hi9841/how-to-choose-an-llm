@@ -16,7 +16,7 @@ Evaluate where computation happens and who controls the weights.
 - **Hosting options**:
   1. **Self-hosted**: Run weights on owned hardware or private cloud instances (AWS EC2, Azure, GCP) using inference engines like vLLM, TGI, or SGLang.
   2. **API providers**: Groq, Together AI, Fireworks, DeepInfra host open models and bill per token or per compute second.
-- **Strengths**: Complete data sovereignty, HIPAA or air-gapped compliance, deterministic model versioning with no stealth updates, customizable inference kernels.
+- **Strengths when self-hosted**: Control over deployment, model versions, and inference configuration. Provider-hosted open weights still send requests to that provider. Weight availability alone establishes neither data sovereignty nor compliance; assess the actual hosting, network access, operational controls, and license.
 - **Constraints**: GPU cluster provisioning, hardware idle costs, operational maintenance burden.
 
 ### Benchmark sources
@@ -59,7 +59,7 @@ Latency dictates whether a model can power realtime interfaces or must stay in b
 2. **Time per output token (TPOT)**:
    - Measures generation speed for each subsequent token.
    - Governed by model parameter count, memory bandwidth, and quantization level.
-   - Dictates reading comfort: human reading speed averages 4 to 8 tokens per second. TPOT should exceed 30 tokens per second for comfortable streaming.
+   - Measure TPOT in time per token, where lower is faster. Output rate is tokens per second, where higher is faster. For example, 30 output tokens per second corresponds to roughly 33 milliseconds per token; it is not a universal usability threshold. Evaluate responsiveness on the actual interface and workload.
 
 ### Inference optimizations
 - **Quantization**: FP8, INT8, and INT4 reduce memory bandwidth pressure and increase throughput with minimal quality loss.
