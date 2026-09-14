@@ -18,7 +18,7 @@ npx skills add Hi9841/how-to-choose-an-llm
 ```
 
 ### Manual installation
-Copy the `skills/how-to-choose-an-llm` directory into your agent's skills location:
+Copy the `how-to-choose-an-llm` directory into your agent's skills location:
 - **Claude Code**: `~/.claude/skills/how-to-choose-an-llm`
 - **Gemini CLI / Antigravity**: `~/.gemini/config/skills/how-to-choose-an-llm`
 - **Project workspace**: `.agents/skills/how-to-choose-an-llm`
@@ -112,12 +112,11 @@ help[2]:
 ```
 how-to-choose-an-llm/
 ├── README.md                          # Repository overview and setup guide
-└── skills/
-    └── how-to-choose-an-llm/          # The main skill folder
-        ├── SKILL.md                   # Agent instructions, decision protocol, and TOON schemas
-        ├── model-inventory.toon       # Engineer model database
-        └── references/
-            └── five-questions-guide.md # Technical reference on hosting, TTFT/TPOT, and evals
+└── how-to-choose-an-llm/              # The main skill folder
+    ├── SKILL.md                       # Agent instructions, decision protocol, and TOON schemas
+    ├── model-inventory.toon           # Engineer model database
+    └── references/
+        └── five-questions-guide.md     # Technical reference on hosting, TTFT/TPOT, and evals
 ```
 
 ---
