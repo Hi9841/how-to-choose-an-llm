@@ -1,80 +1,63 @@
 # how-to-choose-an-llm
 
-> Agent skill for selecting the optimal large language model based on intelligence, latency, cost, context window, and deployment boundaries using Token-Oriented Object Notation (TOON).
+An autonomous agent skill for selecting the optimal LLM based on task constraints, latency targets, economics, and deployment boundaries. Uses **Token-Oriented Object Notation (TOON)** to reduce token overhead by up to 50% compared to standard JSON.
 
-Built for autonomous coding agents (Claude Code, Gemini CLI, Cursor, OpenCode, Codex). Follows the Agent eXperience Interface (AXI) standard for token-efficient agent interactions.
+Compatible with Claude Code, Gemini CLI, Cursor, OpenCode, and Codex.
 
 ---
 
-## Quick install
+## Installation
 
-### Via agent skills CLI
+```bash
 # pnpm
 pnpm dlx skills add Hi9841/how-to-choose-an-llm
 
 # bun
 bunx skills add Hi9841/how-to-choose-an-llm
-
-# npx
-npx skills add Hi9841/how-to-choose-an-llm
 ```
 
-### Manual installation
-Copy the `how-to-choose-an-llm` directory into your agent's skills location:
+### Manual install
+
+Copy the `how-to-choose-an-llm` folder into your agent skills path:
+
 - **Claude Code**: `~/.claude/skills/how-to-choose-an-llm`
 - **Gemini CLI / Antigravity**: `~/.gemini/config/skills/how-to-choose-an-llm`
-- **Project workspace**: `.agents/skills/how-to-choose-an-llm`
+- **Workspace**: `.agents/skills/how-to-choose-an-llm`
 
 ---
 
-## Why TOON instead of JSON?
+## Highlights
 
-Standard JSON payloads waste context window tokens with repeated key strings, quotes, braces, and commas.
-
-This skill standardizes on [TOON (Token-Oriented Object Notation)](https://toonformat.dev/):
-- **Tabular collections**: Declares field names once in the header (`models[N]{name,intel,speed,cost}:`) followed by compact rows.
-- **30% to 50% token reduction**: Minimizes token expenditure on repetitive model evaluations and rankings.
-- **Agent-first ergonomics**: Built specifically for LLM context ingestion and generation.
+- **Pure in-context execution**: No Python or Node scripts required. Agents evaluate models directly.
+- **TOON output**: Emits structured tables in Token-Oriented Object Notation without repeated keys or quotes.
+- **Automatic first-run setup**: If no `model-inventory.toon` exists, the agent launches the setup flow on its first invocation.
+- **Personalized inventories**: Each engineer rates their own available models across providers.
 
 ---
 
-## The 5-question decision framework
+## First-run setup
 
-Every model selection evaluates five fundamental engineering trade-offs:
+Every engineer has access to different models, subscriptions, and local hardware.
 
-1. **Open or closed model**: Self-hosted private infrastructure (vLLM, Ollama, private VPC) versus managed frontier APIs (OpenAI, Anthropic, Google).
-2. **Cost dynamics**: Inverted 1 to 10 scale where 10 is cheapest or zero marginal cost and 1 is frontier reasoning expense.
-3. **Latency dynamics**: Time to first token (TTFT) for interactive UIs versus throughput / time per output token (TPOT).
-4. **Performance and intelligence**: Task complexity tiers from basic schema formatting (5.0) to multi-step reasoning and formal architecture (9.0+).
-5. **Context window capacity**: Matching prompt and completion demands without paying unnecessary latency or cost penalties.
+When no `model-inventory.toon` file exists:
+1. **Automatic detection**: The agent detects a fresh install and initiates setup immediately.
+2. **Starter baseline**: Choose to load the default models or list your own active providers.
+3. **1 to 10 ratings**: Score your models on Intel, Speed, and Cost (10 is cheapest or free).
+4. **Local save**: Saves `model-inventory.toon` and answers your original prompt.
 
----
-
-## First-run setup (`/how-to-choose-an-llm setup`)
-
-Base model inventories differ for every engineer depending on active subscriptions, provider credits, and local hardware.
-
-When no `model-inventory.toon` file is made (first run):
-1. **Automatic execution**: The agent automatically initiates the setup workflow on your first request without requiring manual commands.
-2. **Options**: Choose whether to initialize with the starter baseline (`model-inventory.example.toon`) or enter your own active models and platforms.
-3. **Ratings**: Provide 1-10 ratings for Intel, Speed, and Cost (10 = cheapest/free).
-4. **Persistence**: The skill saves your local `model-inventory.toon` file and immediately completes your original request.
-5. **Re-configuration**: Run `/how-to-choose-an-llm setup` at any time to add or re-score models.
+Reconfigure anytime by running `/how-to-choose-an-llm setup`.
 
 ---
 
-## Archetype weight presets
+## Archetype presets
 
-| Archetype | Intel ($w_{intel}$) | Speed ($w_{speed}$) | Cost ($w_{cost}$) | Use case |
+| Archetype | Intel weight | Speed weight | Cost weight | Best for |
 |---|---|---|---|---|
-| `realtime` | 0.30 | 0.50 | 0.20 | Interactive chat, autocomplete, voice assistants |
-| `reasoning` | 0.70 | 0.10 | 0.20 | Hard bug fixes, architecture sketches, math proofs |
-| `bulk` | 0.20 | 0.20 | 0.60 | High-volume classification, web scraping extraction |
-| `balanced` | 0.40 | 0.35 | 0.25 | Standard agent execution, general assistants |
-| `code` | 0.60 | 0.25 | 0.15 | Multi-file refactoring, code review, feature building |
-
-Composite score calculation:
-$$\text{Score} = (w_{intel} \times \text{intel}) + (w_{speed} \times \text{speed}) + (w_{cost} \times \text{cost})$$
+| `realtime` | 0.30 | 0.50 | 0.20 | Interactive UI, streaming chat, voice |
+| `reasoning` | 0.70 | 0.10 | 0.20 | Bug diagnosis, math proofs, architecture |
+| `bulk` | 0.20 | 0.20 | 0.60 | High-volume classification, batch jobs |
+| `balanced` | 0.40 | 0.35 | 0.25 | General agent workflows, editing |
+| `code` | 0.60 | 0.25 | 0.15 | Refactoring, review, feature generation |
 
 ---
 
@@ -104,8 +87,8 @@ ranked[6]{rank,name,score,intel,speed,cost}:
   5,GPT 5.6 Sol,7.0,7.0,7.0,7.0
   6,Gemini 3.8 Flash,6.8,6.0,8.0,9.0
 help[2]:
-  Specify `--full` if you want provider, tags, and context bounds expanded
   Primary pick Fable 5.1 outscores runner-up by 0.25
+  Specify --full to include tags and provider details
 ```
 
 ---
@@ -114,14 +97,12 @@ help[2]:
 
 ```
 how-to-choose-an-llm/
-├── .gitignore
-├── README.md                          # Repository overview and setup guide
-└── how-to-choose-an-llm/              # The main skill folder
-    ├── SKILL.md                       # Agent instructions, decision protocol, and TOON schemas
-    ├── model-inventory.example.toon   # Tracked starter template
-    ├── model-inventory.toon           # Local personal inventory (created on first run)
+├── README.md
+└── how-to-choose-an-llm/
+    ├── SKILL.md                       # Agent instructions and TOON protocol
+    ├── model-inventory.example.toon   # Starter baseline template
     └── references/
-        └── five-questions-guide.md     # Technical reference on hosting, TTFT/TPOT, and evals
+        └── five-questions-guide.md     # Hosting, TTFT/TPOT, and eval trade-offs
 ```
 
 ---
