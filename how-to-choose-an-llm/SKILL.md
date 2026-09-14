@@ -14,9 +14,9 @@ This skill is agent-first, self-contained, and portable. It requires no external
 The base model inventory differs for every engineer depending on active subscriptions, enterprise accounts, API access, and local GPU hardware.
 
 ### When to run setup
-Run the setup workflow when:
-1. The user explicitly requests `/how-to-choose-an-llm setup` or asks to configure models.
-2. On first run when `model-inventory.toon` is uninitialized or missing.
+The setup workflow executes in two scenarios:
+1. **Automatic first-run execution**: When no `model-inventory.toon` file is made. The agent must immediately run the setup workflow on the very first turn before evaluating or routing any model request. Do not ask the user to manually invoke `/how-to-choose-an-llm setup`; start the guided setup directly.
+2. **Explicit re-configuration**: When the user requests `/how-to-choose-an-llm setup` or asks to edit their model list.
 
 ### Setup protocol
 Guide the engineer through four quick steps:
@@ -70,11 +70,16 @@ Determine the five core task parameters:
    - Balanced: Standard production application features.
    - Low volume: One-off mission-critical tasks where quality outranks cost.
 
-### 2. Locate model inventory
+### 2. Locate model inventory (first-run gate)
 
-1. If the engineer provides a model list or ratings directly in the conversation, use those models and scores.
-2. If `model-inventory.toon` exists in the skill folder or workspace, read it.
-3. If no inventory exists, prompt the engineer to run `/how-to-choose-an-llm setup`.
+1. **In-prompt overrides**: If the engineer provides a model list or ratings directly in the conversation (for example: `GPT 5.6 Sol 7, 7, 7`), evaluate against those models.
+2. **Existing inventory**: If `model-inventory.toon` exists in the skill folder or workspace, read it and proceed to step 3.
+3. **First run (no `model-inventory.toon` file made)**: If no `model-inventory.toon` file exists, the agent must immediately run the setup workflow. Do not output an empty state and do not tell the user to manually run a command. Directly launch the setup sequence:
+   - Announce: `First run detected: no model-inventory.toon found. Running setup.`
+   - Ask the engineer if they want to initialize with the starter baseline (`model-inventory.example.toon`) or customize their own models.
+   - Collect scores (Intel, Speed, Cost on the 1-10 scale), context sizes, and provider tags.
+   - Save the confirmed table to `model-inventory.toon`.
+   - After saving, immediately fulfill the engineer's original evaluation request using their new inventory.
 
 ### 3. Filter and calculate composite scores
 
@@ -144,6 +149,22 @@ help[2]:
 
 ---
 
-## Reference guide
+## Baseline inventory reference
+
+Stored in `model-inventory.example.toon` as a starter template:
+
+```toon
+models[6]{name,intel,speed,cost,context,open,provider,tags}:
+  GPT 5.6 Sol,7.0,7.0,7.0,128000,false,OpenAI,"general,balanced,tool-calling"
+  GPT 6 Astra,8.5,7.0,5.0,256000,false,OpenAI,"reasoning,coding,complex-agent"
+  Fable 5.1,9.0,6.0,5.0,256000,false,Anthropic,"deep-reasoning,architecture,math"
+  Opus 5,7.5,7.0,7.0,200000,false,Anthropic,"writing,analysis,coding,balanced"
+  Gemini 3.8 Flash,6.0,8.0,9.0,1000000,false,Google,"high-speed,massive-context,low-cost,bulk"
+  Kimi K3,8.0,3.0,6.0,200000,false,Moonshot,"deep-search,reasoning,batch"
+```
+
+---
+
+## Technical reference
 
 Read `references/five-questions-guide.md` for background on hosting economics, TTFT versus TPOT, benchmark contamination, and context window retrieval trade-offs.

@@ -9,3 +9,7 @@ __pycache__/
 .system_generated/
 .user_uploaded/
 scratch/
+
+# Personal engineer inventory (generated on first run setup)
+model-inventory.toon
+!model-inventory.example.toon

@@ -54,11 +54,12 @@ Every model selection evaluates five fundamental engineering trade-offs:
 
 Base model inventories differ for every engineer depending on active subscriptions, provider credits, and local hardware.
 
-When installed or on first run:
-1. Invoke `/how-to-choose-an-llm setup`.
-2. Provide your active models and platforms (OpenAI, Anthropic, Google, Moonshot, DeepSeek, local Ollama).
-3. Rate your models on the 1-10 scale for Intel, Speed, and Cost.
-4. The skill saves your personal inventory to `model-inventory.toon`.
+When no `model-inventory.toon` file is made (first run):
+1. **Automatic execution**: The agent automatically initiates the setup workflow on your first request without requiring manual commands.
+2. **Options**: Choose whether to initialize with the starter baseline (`model-inventory.example.toon`) or enter your own active models and platforms.
+3. **Ratings**: Provide 1-10 ratings for Intel, Speed, and Cost (10 = cheapest/free).
+4. **Persistence**: The skill saves your local `model-inventory.toon` file and immediately completes your original request.
+5. **Re-configuration**: Run `/how-to-choose-an-llm setup` at any time to add or re-score models.
 
 ---
 
@@ -113,10 +114,12 @@ help[2]:
 
 ```
 how-to-choose-an-llm/
+├── .gitignore
 ├── README.md                          # Repository overview and setup guide
 └── how-to-choose-an-llm/              # The main skill folder
     ├── SKILL.md                       # Agent instructions, decision protocol, and TOON schemas
-    ├── model-inventory.toon           # Engineer model database
+    ├── model-inventory.example.toon   # Tracked starter template
+    ├── model-inventory.toon           # Local personal inventory (created on first run)
     └── references/
         └── five-questions-guide.md     # Technical reference on hosting, TTFT/TPOT, and evals
 ```
