@@ -1,8 +1,10 @@
 # how-to-choose-an-llm
 
-Agent skill to pick the right LLM for any task. Uses **TOON (Token-Oriented Object Notation)** to cut prompt overhead by up to 50%.
+Agent skill to select the optimal LLM for any task. Uses **TOON (Token-Oriented Object Notation)** to cut prompt overhead by up to 50%.
 
 Zero scripts. Zero dependencies. Runs 100% in-context.
+
+Works with Antigravity CLI, Claude Code, Codex, Cursor, and OpenCode.
 
 ---
 
@@ -18,11 +20,23 @@ pnpm dlx skills add Hi9841/how-to-choose-an-llm
 bunx skills add Hi9841/how-to-choose-an-llm
 ```
 
-### Manual
-Copy `how-to-choose-an-llm` into your agent skills directory:
-- Claude Code: `~/.claude/skills/how-to-choose-an-llm`
-- Gemini CLI: `~/.gemini/config/skills/how-to-choose-an-llm`
-- Workspace: `.agents/skills/how-to-choose-an-llm`
+### npx
+```bash
+npx skills add Hi9841/how-to-choose-an-llm
+```
+
+---
+
+## Manual install
+
+Copy `how-to-choose-an-llm` into your agent skills path:
+
+- **Antigravity CLI**: `~/.gemini/config/skills/how-to-choose-an-llm`
+- **Claude Code**: `~/.claude/skills/how-to-choose-an-llm`
+- **Codex**: `~/.codex/skills/how-to-choose-an-llm`
+- **Cursor**: `.cursor/skills/how-to-choose-an-llm`
+- **OpenCode**: `~/.opencode/skills/how-to-choose-an-llm`
+- **Workspace**: `.agents/skills/how-to-choose-an-llm`
 
 ---
 
