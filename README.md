@@ -10,6 +10,10 @@ Built for autonomous coding agents (Claude Code, Gemini CLI, Cursor, OpenCode, C
 
 ### Via agent skills CLI
 ```bash
+# bun (recommended)
+bunx skills add Hi9841/how-to-choose-an-llm
+
+# npx
 npx skills add Hi9841/how-to-choose-an-llm
 ```
 
