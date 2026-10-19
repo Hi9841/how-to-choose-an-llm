@@ -4,7 +4,7 @@ An instruction-only skill that ranks your available model deployments by task co
 
 Zero scripts. Zero dependencies. Runs 100% in-context.
 
-The discovered skill name is `choose-llm`; the repository is named `how-to-choose-an-llm`. Use an agent that supports skills, or load its instructions manually. Invocation syntax varies by agent.
+The discovered skill name is `choose-llm`. The repository name is `how-to-choose-an-llm`. Use an agent that supports skills, or load its instructions manually. Invocation syntax varies by agent.
 
 ---
 
@@ -98,7 +98,7 @@ When neither a supplied nor a saved inventory is available:
 2. Confirm model access, hosting, context, and ratings for intelligence, speed, and cost efficiency on a 1-10 scale. A cost rating of 10 means cheapest.
 3. The agent saves the confirmed inventory in your workspace and fulfills the original request. Updating an explicitly chosen existing file preserves that location.
 
-The starter is an example, not a live catalog. Ratings are subjective; they are not benchmark results. For real recommendations, the agent checks changing provider facts against official sources when tools allow. Without verification, the recommendation is labeled provisional. No provider access or live model benchmark is performed by the skill itself.
+The starter is an example, not a live catalog. Ratings are subjective. They are not benchmark results. For real recommendations, the agent checks changing provider facts against official sources when tools allow. Without verification, the recommendation is labeled provisional. The skill itself does not access providers or run live model benchmarks.
 
 Reconfigure with "choose-llm setup". Keep personal inventory files out of public commits unless intentionally shared.
 
